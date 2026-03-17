@@ -872,7 +872,23 @@ tr:hover td {
         color: var(--purple);
     }
     .sidebar-footer {
-        display: none;
+        display: flex;
+        padding: 10px 20px;
+        border-top: 1px solid var(--glass-border);
+        margin-top: 10px;
+        justify-content: center;
+    }
+    .sidebar-footer .nav-item {
+        flex-shrink: 0;
+        padding: 10px 15px;
+        border-radius: 8px;
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--red);
+        margin: 0;
+    }
+    .sidebar-footer .nav-item:hover {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--red);
     }
 
     /* Topbar */
@@ -980,6 +996,13 @@ tr:hover td {
         width: 100%;
         justify-content: center;
         margin-bottom: 10px;
+    }
+    .sidebar-footer {
+        padding: 8px 15px;
+    }
+    .sidebar-footer .nav-item {
+        padding: 8px 12px;
+        font-size: 0.85rem;
     }
     .filter-group {
         width: 100%;
