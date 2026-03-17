@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Library | Smart Management System</title>
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated Orbs -->
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-green"></div>
+    <div class="orb orb-gold"></div>
+
+    <!-- Login Section -->
+    <!-- Landing Page (Hero) -->
+    <!-- Landing Page (Hero) -->
+    <section id="page-landing" class="landing-page">
+        <header class="landing-nav">
+            <div class="nav-logo">
+                <i class="fas fa-feather-alt"></i>
+                <span>LUMINA</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#features" onclick="closeMobileMenu()">Features</a>
+                <a href="#about" onclick="closeMobileMenu()">About</a>
+                <button class="btn-login-trigger" onclick="showAuth('member'); closeMobileMenu();">Get Started</button>
+            </nav>
+            <div class="mobile-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </header>
+
+        <main class="hero">
+            <div class="hero-content">
+                <span class="hero-tagline">Excellence in Information Management</span>
+                <h1>Smart Library<br>Management, <span style="color: var(--emerald);">Simplified.</span></h1>
+                <p>Empower your institution with an industry-grade platform for cataloging, member engagement, and advanced analytics.</p>
+                
+                <div class="search-container">
+                    <div class="hero-search" id="heroSearch">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search the global catalog..." id="heroSearchInput">
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="floating-books">
+                    <svg class="book-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="bookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.2" />
+                                <stop offset="100%" style="stop-color:#0a192f;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Stylized Floating Books -->
+                        <rect x="150" y="100" width="200" height="280" rx="10" fill="url(#bookGrad)" stroke="#10b981" stroke-width="2"/>
+                        <path d="M150 130 H350" stroke="#10b981" stroke-width="1" opacity="0.3"/>
+                        <path d="M150 160 H350" stroke="#10b981" stroke-width="1" opacity="0.3"/>
+                        <path d="M150 190 H350" stroke="#10b981" stroke-width="1" opacity="0.3"/>
+                        <!-- Smaller book -->
+                        <rect x="100" y="200" width="150" height="200" rx="8" fill="rgba(16, 185, 129, 0.1)" stroke="#10b981" stroke-width="1.5" transform="rotate(-15 175 300)"/>
+                    </svg>
+                </div>
+            </div>
+        </main>
+
+        <section id="features" class="features">
+            <div class="section-title">
+                <h2>Intelligent Features</h2>
+                <p>Designed for the next generation of knowledge hubs.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="showAuth('member')">
+                    <i class="fas fa-atlas feature-icon"></i>
+                    <h3>Smart Cataloging</h3>
+                    <p>Advanced ISBN tracking and automated meta-data retrieval for thousands of titles.</p>
+                </div>
+                <div class="feature-card" onclick="showAuth('admin')">
+                    <i class="fas fa-users-cog feature-icon"></i>
+                    <h3>Member Management</h3>
+                    <p>Intuitive role-based access control and detailed member activity profiles.</p>
+                </div>
+                <div class="feature-card" onclick="showAuth('admin')">
+                    <i class="fas fa-exchange-alt feature-icon"></i>
+                    <h3>Issue & Return</h3>
+                    <p>Seamless tracking of assets with automated fine calculation and reminders.</p>
+                </div>
+                <div class="feature-card" onclick="showAuth('admin')">
+                    <i class="fas fa-chart-line feature-icon"></i>
+                    <h3>Real-time Analytics</h3>
+                    <p>Comprehensive dashboard with visual insights into circulation and trends.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="cta-content">
+                <h2>Ready to transform your library?</h2>
+                <p>Join hundreds of institutions already using Lumina to power their research ecosystems.</p>
+                <div style="margin-top: 3rem;">
+                    <button class="cta-btn" onclick="showAuth('member')">Get Started Now</button>
+                    <button class="btn-login-trigger" style="margin-left: 1.5rem; padding: 1.1rem 2.5rem;" onclick="showAuth('admin')">Admin Portal</button>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+            </div>
+            <p>&copy; 2026 Lumina Library Systems. Engineered for Excellence.</p>
+        </footer>
+    </section>
+
+    <!-- Auth Section (Login / Register) -->
+    <section id="page-login" class="auth-section" style="display: none;">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <div class="auth-icon" id="auth-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h1 id="auth-title">Student Portal</h1>
+                <p id="auth-subtitle">Sign in with your credentials</p>
+            </div>
+
+            <!-- Admin Login: Secret ID only -->
+            <div id="admin-login-container" class="auth-form-wrap" style="display: none;">
+                <form id="form-admin-login" class="auth-form">
+                    <div class="form-group">
+                        <label for="admin-secret-id">Secret ID</label>
+                        <input type="password" id="admin-secret-id" placeholder="Enter admin secret ID" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Admin Login</button>
+                </form>
+                <div class="auth-footer">
+                    <a href="#" class="auth-back" onclick="showLanding(); return false;"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+            </div>
+
+            <!-- Student Login -->
+            <div id="login-form-container" class="auth-form-wrap">
+                <form id="form-login" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-username">Login ID</label>
+                        <input type="text" id="login-username" placeholder="e.g. STU1 (from admin)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Sign In</button>
+                </form>
+                <div class="auth-footer">
+                    <p id="reg-toggle-text">Don't have an account? <a href="#" onclick="toggleAuth(true); return false;">Create one</a></p>
+                    <a href="#" class="auth-back" onclick="showLanding(); return false;"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+            </div>
+
+            <!-- Student Register (self-register) -->
+            <div id="register-form-container" class="auth-form-wrap" style="display: none;">
+                <form id="form-register" class="auth-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="reg-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="reg-email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="reg-phone" placeholder="+91 9876543210" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="reg-username" placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Sign Up</button>
+                </form>
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="#" onclick="toggleAuth(false); return false;">Sign In</a></p>
+                    <a href="#" class="auth-back" onclick="showLanding(); return false;"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="app-container" id="main-app" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-feather-alt"></i>
+                <span>Lumina</span>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active staff-only" onclick="navigate('dashboard')" id="nav-dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="navigate('books')" id="nav-books">
+                    <i class="fas fa-book"></i>
+                    <span>Catalog</span>
+                </div>
+                <div class="nav-item staff-only" onclick="navigate('members')" id="nav-members">
+                    <i class="fas fa-users"></i>
+                    <span>Members</span>
+                </div>
+                <div class="nav-item staff-only" onclick="openCreateStudentModal()" id="nav-create-account">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create Account</span>
+                </div>
+                <div class="nav-item staff-only" onclick="navigate('issue-return')" id="nav-issue-return">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Issue / Return</span>
+                </div>
+                <div class="nav-item member-only" onclick="navigate('my-books')" id="nav-my-books">
+                    <i class="fas fa-book-reader"></i>
+                    <span>My Books</span>
+                </div>
+                <div class="nav-item" onclick="navigate('records')" id="nav-records">
+                    <i class="fas fa-history"></i>
+                    <span>Records</span>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar glass">
+                <div class="breadcrumb">
+                    <span id="page-title">Dashboard</span>
+                </div>
+                <div class="topbar-right">
+                    <div class="user-info">
+                        <span id="display-username">Librarian</span>
+                        <span class="role-badge" id="display-role">Admin</span>
+                    </div>
+                    <div class="clock" id="live-clock">--:--:--</div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-wrapper">
+                <!-- Dashboard Page -->
+                <section id="page-dashboard" class="page active">
+                    <div class="welcome-banner glass">
+                        <h1 id="greeting">Good evening, Librarian</h1>
+                        <p>Here's what's happening in your library today.</p>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card glass purple">
+                            <i class="fas fa-book"></i>
+                            <div class="stat-info">
+                                <h2 id="stat-total-books">0</h2>
+                                <p>Total Books</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass green">
+                            <i class="fas fa-user-check"></i>
+                            <div class="stat-info">
+                                <h2 id="stat-active-members">0</h2>
+                                <p>Active Members</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass gold">
+                            <i class="fas fa-bookmark"></i>
+                            <div class="stat-info">
+                                <h2 id="stat-books-issued">0</h2>
+                                <p>Books Issued</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass red">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="stat-info">
+                                <h2 id="stat-overdue">0</h2>
+                                <p>Overdue Books</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="data-section glass">
+                        <div class="section-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="table-container">
+                            <table id="table-recent">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Member</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Books Page -->
+                <section id="page-books" class="page">
+                    <div class="controls-row">
+                        <div class="search-box glass">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="input-books-search" placeholder="Search by title, author, or ISBN...">
+                        </div>
+                        <button class="btn btn-purple staff-only" onclick="openModal('modal-add-book')">
+                            <i class="fas fa-plus"></i> Add Book
+                        </button>
+                    </div>
+                    <div class="data-section glass">
+                        <div class="table-container">
+                            <table id="table-books">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title & ISBN</th>
+                                        <th>Author</th>
+                                        <th>Category</th>
+                                        <th>Available</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Members Page -->
+                <section id="page-members" class="page">
+                    <div class="controls-row">
+                        <div class="search-box glass">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="input-members-search" placeholder="Search by name or email...">
+                        </div>
+                    </div>
+                    <div class="data-section glass">
+                        <div class="table-container">
+                            <table id="table-members">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Username</th>
+                                        <th>Phone</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Issue/Return Page -->
+                <section id="page-issue-return" class="page">
+                    <div class="issue-flex">
+                        <div class="form-panel glass">
+                            <h3><i class="fas fa-sign-out-alt"></i> Issue a Book</h3>
+                            <form id="form-issuebook">
+                                <div class="form-group">
+                                    <label>Available Book*</label>
+                                    <select id="select-issue-book" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Active Member*</label>
+                                    <select id="select-issue-member" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Due Date*</label>
+                                    <input type="date" id="input-issue-duedate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Librarian Notes</label>
+                                    <textarea id="text-issue-notes" placeholder="Any specific notes..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-green full-width">Issue Book</button>
+                            </form>
+                        </div>
+                        <div class="issued-panel data-section glass">
+                            <h3><i class="fas fa-list"></i> Currently Issued</h3>
+                            <div class="table-container">
+                                <table id="table-issued">
+                                    <thead>
+                                        <tr>
+                                            <th>Book</th>
+                                            <th>Member</th>
+                                            <th>Due Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- My Books Page (Member Portal) -->
+                <section id="page-my-books" class="page">
+                    <div class="welcome-banner glass">
+                        <h2 id="member-welcome">Welcome to your Library Portal</h2>
+                        <p>Track your borrowed books and explore the catalog.</p>
+                    </div>
+                    <div class="data-section glass">
+                        <h3><i class="fas fa-book-reader"></i> My Currently Borrowed Books</h3>
+                        <div class="table-container">
+                            <table id="table-my-books">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Issue Date</th>
+                                        <th>Due Date</th>
+                                        <th>Fine</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Records Page -->
+                <section id="page-records" class="page">
+                    <div class="controls-row">
+                        <div class="filter-group glass">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="issued">Issued</button>
+                            <button class="filter-btn" data-filter="returned">Returned</button>
+                            <button class="filter-btn" data-filter="overdue">Overdue</button>
+                        </div>
+                    </div>
+                    <div class="data-section glass">
+                        <div class="table-container">
+                            <table id="table-records">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Member</th>
+                                        <th>Issued</th>
+                                        <th>Due</th>
+                                        <th>Returned</th>
+                                        <th>Fine</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-create-student">
+        <div class="modal glass animate-slide">
+            <div class="modal-header">
+                <h2>Create Student Account</h2>
+                <i class="fas fa-times close-modal" onclick="closeModal('modal-create-student')"></i>
+            </div>
+            <div id="create-student-success" class="create-student-success" style="display: none;">
+                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                <h3>Account created</h3>
+                <p class="login-id-display">Student can sign in with:</p>
+                <p class="login-id-value" id="created-login-id">—</p>
+                <p class="login-id-hint">Share this Login ID and the password you set with the student.</p>
+                <button type="button" class="btn btn-primary" onclick="closeModal('modal-create-student'); document.getElementById('create-student-success').style.display='none'; document.getElementById('form-create-student-wrap').style.display='block';">Done</button>
+            </div>
+            <div id="form-create-student-wrap">
+                <form id="form-create-student" class="modal-body">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="create-student-name" placeholder="Student full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="create-student-email" placeholder="student@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="create-student-password" placeholder="Student will use this to sign in" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-create-student')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-add-book">
+        <div class="modal glass animate-slide">
+            <div class="modal-header">
+                <h2>Add New Book</h2>
+                <i class="fas fa-times close-modal" onclick="closeModal('modal-add-book')"></i>
+            </div>
+            <form id="form-add-book" class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Title*</label>
+                        <input type="text" id="book-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Author*</label>
+                        <input type="text" id="book-author" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ISBN*</label>
+                        <input type="text" id="book-isbn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="book-category">
+                            <option value="Fiction">Fiction</option>
+                            <option value="Science">Science</option>
+                            <option value="History">History</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Philosophy">Philosophy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Copies</label>
+                        <input type="number" id="book-total" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Published Year</label>
+                        <input type="number" id="book-year" placeholder="YYYY">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-book')">Cancel</button>
+                    <button type="submit" class="btn btn-purple">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-add-member">
+        <div class="modal glass animate-slide">
+            <div class="modal-header">
+                <h2>Add New Member</h2>
+                <i class="fas fa-times close-modal" onclick="closeModal('modal-add-member')"></i>
+            </div>
+            <form id="form-add-member" class="modal-body">
+                <div class="form-group">
+                    <label>Full Name*</label>
+                    <input type="text" id="member-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address*</label>
+                    <input type="email" id="member-email" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="member-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Membership Type</label>
+                        <select id="member-type">
+                            <option value="basic">Basic</option>
+                            <option value="student">Student</option>
+                            <option value="premium">Premium</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="member-address" placeholder="Residential address..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-member')">Cancel</button>
+                    <button type="submit" class="btn btn-purple">Register Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-edit-book">
+        <div class="modal glass animate-slide">
+            <div class="modal-header">
+                <h2>Edit Book</h2>
+                <i class="fas fa-times close-modal" onclick="closeModal('modal-edit-book')"></i>
+            </div>
+            <form id="form-edit-book" class="modal-body">
+                <input type="hidden" id="edit-book-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Title*</label>
+                        <input type="text" id="edit-book-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Author*</label>
+                        <input type="text" id="edit-book-author" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ISBN*</label>
+                        <input type="text" id="edit-book-isbn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="edit-book-category">
+                            <option value="Fiction">Fiction</option>
+                            <option value="Science">Science</option>
+                            <option value="History">History</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Philosophy">Philosophy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Copies</label>
+                        <input type="number" id="edit-book-total" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Published Year</label>
+                        <input type="number" id="edit-book-year" placeholder="YYYY">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-book')">Cancel</button>
+                    <button type="submit" class="btn btn-purple">Update Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-edit-member">
+        <div class="modal glass animate-slide">
+            <div class="modal-header">
+                <h2>Edit Member</h2>
+                <i class="fas fa-times close-modal" onclick="closeModal('modal-edit-member')"></i>
+            </div>
+            <form id="form-edit-member" class="modal-body">
+                <input type="hidden" id="edit-member-id">
+                <div class="form-group">
+                    <label>Full Name*</label>
+                    <input type="text" id="edit-member-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address*</label>
+                    <input type="email" id="edit-member-email" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="edit-member-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Membership Type</label>
+                        <select id="edit-member-type">
+                            <option value="basic">Basic</option>
+                            <option value="student">Student</option>
+                            <option value="premium">Premium</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="edit-member-status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="edit-member-address" placeholder="Residential address..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-member')">Cancel</button>
+                    <button type="submit" class="btn btn-purple">Update Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/app.js?v=4"></script>
+    <script>
+        // Landing Page Interactions
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('.landing-nav');
+            const heroSearch = document.getElementById('heroSearch');
+            const heroSearchInput = document.getElementById('heroSearchInput');
+            const socialIcons = document.querySelectorAll('.social-icons a');
+            const ctaBtn = document.querySelector('.cta-btn');
+            const mobileToggle = document.getElementById('mobileToggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            // Mobile Menu Toggle
+            mobileToggle.addEventListener('click', () => {
+                mobileToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            window.closeMobileMenu = () => {
+                mobileToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+            };
+
+            // Header Scroll Effect
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Search Bar Expansion
+            heroSearch.addEventListener('click', (e) => {
+                heroSearch.classList.add('expanded');
+                heroSearchInput.focus();
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', () => {
+                if (heroSearchInput.value === '') {
+                    heroSearch.classList.remove('expanded');
+                }
+            });
+
+            // Ripple Effect for CTA
+            ctaBtn.addEventListener('click', function(e) {
+                let x = e.clientX - e.target.offsetLeft;
+                let y = e.clientY - e.target.offsetTop;
+                let ripples = document.createElement('span');
+                ripples.classList.add('ripple');
+                ripples.style.left = x + 'px';
+                ripples.style.top = y + 'px';
+                this.appendChild(ripples);
+                setTimeout(() => { ripples.remove() }, 600);
+            });
+
+            // Reveal animations for social icons
+            const observerOptions = { threshold: 0.1 };
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('reveal');
+                        }, index * 100);
+                    }
+                });
+            }, observerOptions);
+
+            socialIcons.forEach(icon => revealObserver.observe(icon));
+
+            // Smooth parallax for hero books
+            document.addEventListener('mousemove', (e) => {
+                const books = document.querySelector('.floating-books');
+                const x = (window.innerWidth - e.pageX * 2) / 100;
+                const y = (window.innerHeight - e.pageY * 2) / 100;
+                books.style.transform = `translateX(${x}px) translateY(${y}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
