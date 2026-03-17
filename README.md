@@ -4,52 +4,6 @@ A premium, modern Library Management System (LMS) with dual portals for Students
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v16+ recommended)
-- [MySQL](https://www.mysql.com/) (Optional: The system automatically falls back to **Mock Mode** if no database is found)
-
-### Installation
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Configure the environment:
-   Create a `.env` file in the root directory with the following:
-   ```env
-   PORT=3000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_password
-   DB_NAME=library_db
-   ADMIN_SECRET_ID=7905
-   ```
-4. Setup the database (if using MySQL):
-   ```bash
-   npm run setup-db
-   ```
-
-### Running the App
-- **Development Mode:**
-  ```bash
-  npm run dev
-  ```
-- **Production Mode:**
-  ```bash
-  npm start
-  ```
-The application will be available at [http://localhost:3000](http://localhost:3000).
-
-### 📱 Access from Other Devices (Phone/Laptop on same Wi-Fi)
-Find your laptop's local IP by running `ipconfig` (Windows) and look for **IPv4 Address** under Wi-Fi.
-
-Then on any device on the same Wi-Fi, open:
-```
-http://192.168.29.92:3000
-```
-> Replace `192.168.29.92` with your current local IP — it may change each time you reconnect to Wi-Fi.
-
----
 
 ## 📁 Project Structure
 
