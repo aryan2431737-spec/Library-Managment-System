@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/landing.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
     <!-- Animated Orbs -->
@@ -97,6 +98,11 @@
                     <h3>Real-time Analytics</h3>
                     <p>Comprehensive dashboard with visual insights into circulation and trends.</p>
                 </div>
+                <div class="feature-card" onclick="showAuth('admin')">
+                    <i class="fas fa-user-shield feature-icon"></i>
+                    <h3>Admin Portal</h3>
+                    <p>Secure administrative access for system management and oversight.</p>
+                </div>
             </div>
         </section>
 
@@ -106,7 +112,6 @@
                 <p>Join hundreds of institutions already using Lumina to power their research ecosystems.</p>
                 <div style="margin-top: 3rem;">
                     <button class="cta-btn" onclick="showAuth('member')">Get Started Now</button>
-                    <button class="btn-login-trigger" style="margin-left: 1.5rem; padding: 1.1rem 2.5rem;" onclick="showAuth('admin')">Admin Portal</button>
                 </div>
             </div>
         </section>
