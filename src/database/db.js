@@ -3,32 +3,37 @@ require('dotenv').config();
 
 let pool;
 let isMock = false;
+const hasDbConfig = Boolean(process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME);
 
-// Attempt real MySQL connection
-try {
-  pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    connectTimeout: 2000
-  });
+if (!hasDbConfig) {
+    console.warn('DB config not found. Running in MOCK MODE.');
+    isMock = true;
+} else {
+    try {
+        pool = mysql.createPool({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD || '',
+            database: process.env.DB_NAME,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0,
+            connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT_MS) || 4000
+        });
 
-  pool.getConnection()
-    .then(conn => {
-      console.log('Connected to MySQL successfully.');
-      conn.release();
-    })
-    .catch(err => {
-      console.warn('MySQL Connection failed. Falling back to MOCK MODE.');
-      isMock = true;
-    });
-} catch (err) {
-  console.warn('Failed to initialize MySQL pool. Falling back to MOCK MODE.');
-  isMock = true;
+        pool.getConnection()
+            .then(conn => {
+                console.log('Connected to MySQL successfully.');
+                conn.release();
+            })
+            .catch(() => {
+                console.warn('MySQL connection failed. Falling back to MOCK MODE.');
+                isMock = true;
+            });
+    } catch (err) {
+        console.warn('Failed to initialize MySQL pool. Falling back to MOCK MODE.');
+        isMock = true;
+    }
 }
 
 // Stateful Mock Data
@@ -256,16 +261,17 @@ const mock = {
 };
 
 async function query(sql, params) {
-  if (isMock) return mock.query(sql, params);
-  try {
-    return await pool.query(sql, params);
-  } catch (err) {
-    console.warn('MySQL query failed, using mock:', err.message);
-    isMock = true;
-    return mock.query(sql, params);
-  }
+    if (isMock || !pool) return mock.query(sql, params);
+    try {
+        return await pool.query(sql, params);
+    } catch (err) {
+        console.warn('MySQL query failed, using mock:', err.message);
+        isMock = true;
+        return mock.query(sql, params);
+    }
 }
 
 module.exports = {
-  query
+    query,
+    isUsingMock: () => isMock
 };

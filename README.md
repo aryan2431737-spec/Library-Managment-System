@@ -2,6 +2,14 @@
 
 A premium, modern Library Management System (LMS) with dual portals for Students and Administrators.
 
+## Render Deployment Notes
+
+- Start command: `npm start`
+- Health check path: `/healthz`
+- Optional API health endpoint: `/api/health`
+- If `DB_HOST`, `DB_USER`, or `DB_NAME` are missing, the app auto-runs in mock mode.
+- Use `.env.example` as the template for environment variables.
+
 ## 🚀 Getting Started
 
 

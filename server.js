@@ -11,6 +11,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Health checks for Render and uptime monitoring
+app.get('/healthz', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        service: 'library-system',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.get('/api/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        service: 'library-system',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Routes
 const bookRoutes = require(path.join(__dirname, 'src', 'routes', 'books'));
 const memberRoutes = require(path.join(__dirname, 'src', 'routes', 'members'));
@@ -29,7 +46,11 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Library System running on http://localhost:${PORT}`);
-    console.log(`Network access: http://<your-local-IP>:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Library System running on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+    console.error('Server startup failed:', err);
+    process.exit(1);
 });
