@@ -1,12 +1,36 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
+function isLocalDatabaseHost(host) {
+    const normalizedHost = String(host || '').trim().toLowerCase();
+    return normalizedHost === 'localhost' || normalizedHost === '127.0.0.1' || normalizedHost === '::1';
+}
+
+function getSslConfig() {
+    if (process.env.DB_SSL !== 'true') {
+        return undefined;
+    }
+
+    return {
+        rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
+    };
+}
+
 async function setup() {
+    if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
+        throw new Error('DB_HOST, DB_USER and DB_NAME are required before running setup-db.');
+    }
+
+    if (isLocalDatabaseHost(process.env.DB_HOST)) {
+        console.warn('DB_HOST is set to localhost. This works only for local MySQL, not for Render.');
+    }
+
     const connection = await mysql.createConnection({
         host: process.env.DB_HOST,
         port: Number(process.env.DB_PORT || 3306),
         user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD
+        password: process.env.DB_PASSWORD,
+        ssl: getSslConfig()
     });
 
     console.log('Connected to MySQL server for setup.');

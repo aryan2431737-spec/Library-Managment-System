@@ -3,8 +3,31 @@ require('dotenv').config();
 
 let pool;
 let isMock = false;
+let initError = null;
 const allowMock = process.env.ALLOW_MOCK_DATA === 'true';
 const hasDbConfig = Boolean(process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME);
+
+function isLocalDatabaseHost(host) {
+    const normalizedHost = String(host || '').trim().toLowerCase();
+    return normalizedHost === 'localhost' || normalizedHost === '127.0.0.1' || normalizedHost === '::1';
+}
+
+function getHostedDatabaseHint() {
+    if (!hasDbConfig || !isLocalDatabaseHost(process.env.DB_HOST)) {
+        return '';
+    }
+    return 'DB_HOST is set to localhost. This only works on your own computer, not on Render. Use your hosted MySQL provider hostname instead.';
+}
+
+function getSslConfig() {
+    if (process.env.DB_SSL !== 'true') {
+        return undefined;
+    }
+
+    return {
+        rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
+    };
+}
 
 const dbConfig = hasDbConfig ? {
     host: process.env.DB_HOST,
@@ -15,7 +38,8 @@ const dbConfig = hasDbConfig ? {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT_MS) || 4000
+    connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT_MS) || 4000,
+    ssl: getSslConfig()
 } : null;
 
 async function initPool() {
@@ -29,23 +53,27 @@ async function initPool() {
         console.log('Connected to MySQL successfully.');
         conn.release();
     } catch (err) {
+        pool = null;
         return failOrMock('MySQL connection failed.', err);
     }
 }
 
 function failOrMock(message, err) {
+    const hint = getHostedDatabaseHint();
+    const detail = [message, hint].filter(Boolean).join(' ');
+
     if (allowMock) {
-        console.warn(`${message} Falling back to MOCK MODE.`, err ? err.message : '');
+        console.warn(`${detail} Falling back to MOCK MODE.`, err ? err.message : '');
         isMock = true;
         return;
     }
-    console.error(`${message} Set database env vars or enable ALLOW_MOCK_DATA=true for dev.`);
-    throw err || new Error(message);
+    console.error(`${detail} Set database env vars or enable ALLOW_MOCK_DATA=true for dev.`);
+    throw new Error(err ? `${detail} ${err.message}`.trim() : detail);
 }
 
 const initPromise = initPool().catch(err => {
-    console.error('Database initialization failed:', err.message);
-    process.exit(1);
+    initError = err;
+    throw err;
 });
 
 // Stateful Mock Data
@@ -289,5 +317,13 @@ async function query(sql, params) {
 module.exports = {
     query,
     isUsingMock: () => isMock,
-    dbConfig
+    dbConfig,
+    waitForDatabase: () => initPromise,
+    getDatabaseMode: () => {
+        if (isMock) return 'mock';
+        if (pool) return 'mysql';
+        if (initError) return 'error';
+        if (!hasDbConfig) return 'unconfigured';
+        return 'connecting';
+    }
 };

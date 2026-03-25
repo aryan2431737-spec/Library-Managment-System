@@ -8,6 +8,8 @@ A premium, modern Library Management System (LMS) with dual portals for Students
 - Health check path: `/healthz`
 - Optional API health endpoint: `/api/health`
 - MySQL is required for persistence (users, sessions, data). The app will stop if `DB_HOST`, `DB_USER`, or `DB_NAME` are missing.
+- `DB_HOST=localhost` only works on your own computer. On Render, use the hostname from your hosted MySQL provider.
+- If your MySQL provider requires TLS/SSL, set `DB_SSL=true` and redeploy.
 - Use `.env.example` as the template, then run `npm run setup-db` once to provision tables (including persistent `sessions`).
 - Sessions are stored in MySQL via `express-session`; set `SESSION_SECRET` and keep `ALLOW_MOCK_DATA=false` in production so redeploys do not wipe users.
 
