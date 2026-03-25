@@ -7,8 +7,9 @@ A premium, modern Library Management System (LMS) with dual portals for Students
 - Start command: `npm start`
 - Health check path: `/healthz`
 - Optional API health endpoint: `/api/health`
-- If `DB_HOST`, `DB_USER`, or `DB_NAME` are missing, the app auto-runs in mock mode.
-- Use `.env.example` as the template for environment variables.
+- MySQL is required for persistence (users, sessions, data). The app will stop if `DB_HOST`, `DB_USER`, or `DB_NAME` are missing.
+- Use `.env.example` as the template, then run `npm run setup-db` once to provision tables (including persistent `sessions`).
+- Sessions are stored in MySQL via `express-session`; set `SESSION_SECRET` and keep `ALLOW_MOCK_DATA=false` in production so redeploys do not wipe users.
 
 ## 🚀 Getting Started
 

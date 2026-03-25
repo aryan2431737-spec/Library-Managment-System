@@ -128,6 +128,7 @@ function toggleAuth(isRegister) {
 
 function showApp() {
     if (!currentUser) return;
+    const displayName = currentUser.name || currentUser.username || 'User';
     var landing = document.getElementById('page-landing');
     var loginPage = document.getElementById('page-login');
     var mainApp = document.getElementById('main-app');
@@ -136,7 +137,7 @@ function showApp() {
     if (mainApp) mainApp.style.display = 'flex';
     var un = document.getElementById('display-username');
     var roleEl = document.getElementById('display-role');
-    if (un) un.innerText = currentUser.username || 'User';
+    if (un) un.innerText = displayName;
     if (roleEl) roleEl.innerText = currentUser.role || 'member';
     document.body.className = 'role-' + (currentUser.role || 'member');
     
@@ -144,7 +145,7 @@ function showApp() {
         document.querySelectorAll('.staff-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.member-only').forEach(el => el.style.display = 'flex');
         const welcomeEl = document.getElementById('member-welcome');
-        if (welcomeEl) welcomeEl.textContent = `Welcome, ${currentUser.username}`;
+        if (welcomeEl) welcomeEl.textContent = `Welcome, ${displayName}`;
         // Strictly prevent dashboard access – go to member dashboard (My Books)
         if (currentSection === 'dashboard') {
             navigate('my-books');
@@ -197,7 +198,7 @@ async function login(username, password) {
         if (res.ok && data && (data.role === 'member' || data.role === 'staff')) {
             currentUser = data;
             localStorage.setItem('lib_user', JSON.stringify(data));
-            showToast('Welcome, ' + (data.username || ''));
+            showToast('Welcome, ' + (data.name || data.username || ''));
             showApp();
         } else {
             showToast((data && data.error) || 'Invalid Login ID or password', 'error');
@@ -291,7 +292,7 @@ async function loadDashboard() {
     document.getElementById('stat-books-issued').innerText = data.active_issues;
     document.getElementById('stat-overdue').innerText = data.overdue_books;
 
-    document.getElementById('greeting').innerText = `Good day, ${currentUser.username}`;
+    document.getElementById('greeting').innerText = `Good day, ${currentUser.name || currentUser.username}`;
 
     const tbody = document.querySelector('#table-recent tbody');
     tbody.innerHTML = data.recent_issues.map(row => `

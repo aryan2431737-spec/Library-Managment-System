@@ -1,14 +1,49 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config();
+const { dbConfig } = require('./src/database/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SESSION_MAX_AGE_MS = (Number(process.env.SESSION_MAX_AGE_DAYS) || 7) * 24 * 60 * 60 * 1000;
+const allowMock = process.env.ALLOW_MOCK_DATA === 'true';
+
+let sessionStore;
+if (dbConfig) {
+    sessionStore = new MySQLStore({
+        ...dbConfig,
+        clearExpired: true,
+        checkExpirationInterval: 15 * 60 * 1000,
+        expiration: SESSION_MAX_AGE_MS,
+        createDatabaseTable: true,
+        schema: { tableName: 'sessions' }
+    });
+} else if (!allowMock) {
+    throw new Error('Database config missing. Set DB_HOST, DB_USER, DB_PASSWORD, DB_NAME for persistent auth.');
+} else {
+    console.warn('Running without DB config because ALLOW_MOCK_DATA=true. Sessions will reset on restart.');
+}
 
 // Middleware
-app.use(cors());
+app.set('trust proxy', 1);
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || true, credentials: true }));
 app.use(express.json());
+app.use(session({
+    name: 'lib.sid',
+    secret: process.env.SESSION_SECRET || 'library-session-secret-change-me',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: SESSION_MAX_AGE_MS
+    }
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Health checks for Render and uptime monitoring

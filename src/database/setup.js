@@ -4,6 +4,7 @@ require('dotenv').config();
 async function setup() {
     const connection = await mysql.createConnection({
         host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT || 3306),
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD
     });
@@ -78,6 +79,19 @@ async function setup() {
     `);
     console.log('Table "issues" ensured.');
 
+    // Table: sessions (for express-session persistent store)
+    await connection.query(`
+        CREATE TABLE IF NOT EXISTS sessions (
+            session_id VARCHAR(128) NOT NULL,
+            expires INT(11) UNSIGNED NOT NULL,
+            data MEDIUMTEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (session_id),
+            INDEX expires_idx (expires)
+        ) ENGINE=InnoDB
+    `);
+    console.log('Table "sessions" ensured.');
+
     // Seed Data
     const [bookCount] = await connection.query('SELECT COUNT(*) as count FROM books');
     if (bookCount[0].count === 0) {
@@ -100,12 +114,12 @@ async function setup() {
     const [memberCount] = await connection.query('SELECT COUNT(*) as count FROM members');
     if (memberCount[0].count === 0) {
         await connection.query(`
-            INSERT INTO members (name, email, phone, membership_type, status) VALUES
-            ('Aryan Singh', 'aryan@example.com', '1234567890', 'premium', 'active'),
-            ('Deepak Kumar', 'deepak@example.com', '9876543210', 'student', 'active'),
-            ('Priya Verma', 'priya@example.com', '5554443332', 'basic', 'active'),
-            ('Rahul Shrivastava', 'rahul@example.com', '1112223334', 'student', 'active'),
-            ('Sneha Gupta', 'sneha@example.com', '9998887776', 'basic', 'active')
+            INSERT IGNORE INTO members (name, email, phone, membership_type, status) VALUES
+            ('Aryan Sharma', 'aryan@example.com', '9876543210', 'student', 'active'),
+            ('Priya Singh', 'priya@example.com', '9876543211', 'premium', 'active'),
+            ('Rahul Gupta', 'rahul@example.com', '9876543212', 'basic', 'active'),
+            ('Neha Verma', 'neha@example.com', '9876543213', 'student', 'active'),
+            ('Amit Kumar', 'amit@example.com', '9876543214', 'premium', 'active')
         `);
         console.log('Sample members seeded.');
     }
@@ -115,11 +129,9 @@ async function setup() {
         await connection.query(`
             INSERT INTO users (username, password, role, member_id) VALUES
             ('admin', 'password123', 'admin', NULL),
-            ('staff', 'password123', 'staff', NULL),
-            ('aryan', 'password123', 'member', 1),
-            ('deepak', 'password123', 'member', 2)
+            ('staff', 'password123', 'staff', NULL)
         `);
-        console.log('Sample users seeded.');
+        console.log('Default admin and staff users seeded.');
     }
 
     await connection.end();

@@ -3,38 +3,50 @@ require('dotenv').config();
 
 let pool;
 let isMock = false;
+const allowMock = process.env.ALLOW_MOCK_DATA === 'true';
 const hasDbConfig = Boolean(process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME);
 
-if (!hasDbConfig) {
-    console.warn('DB config not found. Running in MOCK MODE.');
-    isMock = true;
-} else {
-    try {
-        pool = mysql.createPool({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME,
-            waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0,
-            connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT_MS) || 4000
-        });
+const dbConfig = hasDbConfig ? {
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT || 3306),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT_MS) || 4000
+} : null;
 
-        pool.getConnection()
-            .then(conn => {
-                console.log('Connected to MySQL successfully.');
-                conn.release();
-            })
-            .catch(() => {
-                console.warn('MySQL connection failed. Falling back to MOCK MODE.');
-                isMock = true;
-            });
+async function initPool() {
+    if (!hasDbConfig) {
+        return failOrMock('Database config (DB_HOST, DB_USER, DB_NAME) is required for persistence.');
+    }
+
+    try {
+        pool = mysql.createPool(dbConfig);
+        const conn = await pool.getConnection();
+        console.log('Connected to MySQL successfully.');
+        conn.release();
     } catch (err) {
-        console.warn('Failed to initialize MySQL pool. Falling back to MOCK MODE.');
-        isMock = true;
+        return failOrMock('MySQL connection failed.', err);
     }
 }
+
+function failOrMock(message, err) {
+    if (allowMock) {
+        console.warn(`${message} Falling back to MOCK MODE.`, err ? err.message : '');
+        isMock = true;
+        return;
+    }
+    console.error(`${message} Set database env vars or enable ALLOW_MOCK_DATA=true for dev.`);
+    throw err || new Error(message);
+}
+
+const initPromise = initPool().catch(err => {
+    console.error('Database initialization failed:', err.message);
+    process.exit(1);
+});
 
 // Stateful Mock Data
 let mockBooks = [
@@ -261,10 +273,13 @@ const mock = {
 };
 
 async function query(sql, params) {
+    await initPromise;
+
     if (isMock || !pool) return mock.query(sql, params);
     try {
         return await pool.query(sql, params);
     } catch (err) {
+        if (!allowMock) throw err;
         console.warn('MySQL query failed, using mock:', err.message);
         isMock = true;
         return mock.query(sql, params);
@@ -273,5 +288,6 @@ async function query(sql, params) {
 
 module.exports = {
     query,
-    isUsingMock: () => isMock
+    isUsingMock: () => isMock,
+    dbConfig
 };
