@@ -17,17 +17,8 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || true, credentials: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Health checks for Render and uptime monitoring
+// Health checks (Available immediately)
 app.get('/healthz', (req, res) => {
-    res.status(200).json({
-        status: 'ok',
-        service: 'library-system',
-        database: db.getDatabaseMode(),
-        timestamp: new Date().toISOString()
-    });
-});
-
-app.get('/api/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
         service: 'library-system',
@@ -69,7 +60,8 @@ function createSessionMiddleware() {
     } else if (allowMock) {
         console.warn('Using MemoryStore for sessions because MySQL is unavailable and ALLOW_MOCK_DATA=true.');
     } else {
-        throw new Error('Database config missing. Set DB_HOST, DB_USER, DB_PASSWORD, DB_NAME for persistent auth.');
+        // Return null or throw? Let's return memory store if in trouble but warn strongly
+        console.error('Critical: Database config missing for MySQLStore. Falling back to MemoryStore.');
     }
 
     return session(sessionConfig);
@@ -77,7 +69,30 @@ function createSessionMiddleware() {
 
 async function startServer() {
     try {
-        // App Middlewares
+        // Step 1: Bind to port immediately so Render is happy
+        const server = app.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Library System starting on port ${PORT}`);
+        });
+
+        server.on('error', (err) => {
+            console.error('Port binding failed:', err);
+            process.exit(1);
+        });
+
+        // Step 2: Wait for database connection in background
+        console.log('⏳ Connecting to database...');
+        try {
+            await db.waitForDatabase();
+            console.log(`✅ Database ready (Mode: ${db.getDatabaseMode()})`);
+        } catch (dbErr) {
+            console.warn('⚠️ Database connection failed:', dbErr.message);
+            if (process.env.NODE_ENV === 'production' && !allowMock) {
+                console.error('‼️ CRITICAL: Production requiere database. Shuting down.');
+                process.exit(1);
+            }
+        }
+
+        // Step 3: Initialize Session and Routes (Now that DB state is known)
         app.use(createSessionMiddleware());
         app.use('/api/books', bookRoutes);
         app.use('/api/members', memberRoutes);
@@ -90,26 +105,7 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public', 'index.html'));
         });
 
-        const server = app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Library System running on port ${PORT}`);
-            console.log(`Database Mode: ${db.getDatabaseMode()}`);
-        });
-
-        server.on('error', (err) => {
-            console.error('Server startup failed (check port availability):', err);
-            process.exit(1);
-        });
-
-        // Background Database Readiness
-        db.waitForDatabase()
-            .then(() => console.log('✅ Database connection established.'))
-            .catch(err => {
-                console.error('❌ Database connection failed at startup:', err.message);
-                if (process.env.NODE_ENV === 'production' && !allowMock) {
-                    console.error('Critical shutdown: Production DB required.');
-                    process.exit(1);
-                }
-            });
+        console.log('🌐 All routes and services initialized.');
 
     } catch (err) {
         console.error('Critical boot failure:', err.message);
