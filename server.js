@@ -77,8 +77,7 @@ function createSessionMiddleware() {
 
 async function startServer() {
     try {
-        await db.waitForDatabase();
-
+        // App Middlewares
         app.use(createSessionMiddleware());
         app.use('/api/books', bookRoutes);
         app.use('/api/members', memberRoutes);
@@ -92,15 +91,28 @@ async function startServer() {
         });
 
         const server = app.listen(PORT, '0.0.0.0', () => {
-            console.log(`Library System running on port ${PORT}`);
+            console.log(`🚀 Library System running on port ${PORT}`);
+            console.log(`Database Mode: ${db.getDatabaseMode()}`);
         });
 
         server.on('error', (err) => {
-            console.error('Server startup failed:', err);
+            console.error('Server startup failed (check port availability):', err);
             process.exit(1);
         });
+
+        // Background Database Readiness
+        db.waitForDatabase()
+            .then(() => console.log('✅ Database connection established.'))
+            .catch(err => {
+                console.error('❌ Database connection failed at startup:', err.message);
+                if (process.env.NODE_ENV === 'production' && !allowMock) {
+                    console.error('Critical shutdown: Production DB required.');
+                    process.exit(1);
+                }
+            });
+
     } catch (err) {
-        console.error('Server startup failed:', err.message);
+        console.error('Critical boot failure:', err.message);
         process.exit(1);
     }
 }
