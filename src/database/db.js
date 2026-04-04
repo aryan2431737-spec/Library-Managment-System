@@ -130,14 +130,22 @@ const mock = {
             if (q.includes('from members')) {
                 let membersData = mockMembers.map(m => {
                     const user = mockUsers.find(u => u.member_id === m.id);
-                    return { ...m, username: user ? user.username : null };
+                    return {
+                        ...m,
+                        username: user ? user.username : null,
+                        user_id: user ? user.id : null
+                    };
                 });
-                
-                if (q.includes('where id = ?')) {
+
+                const hasMemberIdFilter = q.includes('where id = ?') || q.includes('where m.id = ?');
+                const hasMemberEmailFilter = q.includes('where email = ?') || q.includes('where m.email = ?');
+
+                if (hasMemberIdFilter) {
                     return [membersData.filter(m => m.id == params[0])];
                 }
-                if (q.includes('where email = ?')) {
-                    return [membersData.filter(m => m.email === params[0])];
+                if (hasMemberEmailFilter) {
+                    const email = String(params[0] || '').toLowerCase();
+                    return [membersData.filter(m => String(m.email || '').toLowerCase() === email)];
                 }
                 if (params && params.length > 0) {
                     const term = params[0].toString().toLowerCase().replace(/%/g, '');
@@ -150,13 +158,25 @@ const mock = {
                 return [membersData];
             }
             if (q.includes('from users')) {
-                if (q.includes('where username = ?')) {
-                    return [mockUsers.filter(u => u.username === params[0])];
+                const usersData = mockUsers.map(u => {
+                    const member = mockMembers.find(m => m.id === u.member_id);
+                    return { ...u, name: member ? member.name : null };
+                });
+
+                const hasCredentialsFilter =
+                    q.includes('where username = ? and password = ?') ||
+                    q.includes('where u.username = ? and u.password = ?');
+                const hasUsernameFilter =
+                    q.includes('where username = ?') ||
+                    q.includes('where u.username = ?');
+
+                if (hasCredentialsFilter) {
+                    return [usersData.filter(u => u.username === params[0] && u.password === params[1])];
                 }
-                if (q.includes('where username = ? and password = ?')) {
-                    return [mockUsers.filter(u => u.username === params[0] && u.password === params[1])];
+                if (hasUsernameFilter) {
+                    return [usersData.filter(u => u.username === params[0])];
                 }
-                return [mockUsers];
+                return [usersData];
             }
             if (q.includes('from issues')) {
                 // Enrich issues with book/member info (simulating JOIN)
@@ -193,21 +213,30 @@ const mock = {
                 return [{ insertId: b.id }];
             }
             if (q.includes('into members')) {
-                // Auth register: (name, email, phone, membership_type, status) = 5 params
-                // Members API: (name, email, phone, membership_type, address) = 5 params
-                const isAuthRegister = q.includes('membership_type, status');
-                const isMembersApi = q.includes('membership_type, status) VALUES') === false;
+                const columnsMatch = q.match(/into members\s*\(([^)]+)\)\s*values/);
+                const columns = columnsMatch
+                    ? columnsMatch[1].split(',').map(col => col.trim().replace(/`/g, ''))
+                    : ['name', 'email', 'phone', 'membership_type', 'status'];
 
                 const m = {
                     id: mockMembers.length + 1,
-                    name: params[0],
-                    email: params[1],
-                    phone: params[2] || null,
-                    membership_type: params[3],
-                    address: isMembersApi ? params[4] : null,
-                    status: isAuthRegister ? params[4] : 'active',
+                    name: null,
+                    email: null,
+                    phone: null,
+                    address: null,
+                    membership_type: 'basic',
+                    status: 'active',
                     created_at: new Date()
                 };
+
+                columns.forEach((column, idx) => {
+                    m[column] = params[idx] !== undefined ? params[idx] : null;
+                });
+
+                if (!m.status) {
+                    m.status = 'active';
+                }
+
                 mockMembers.push(m);
                 return [{ insertId: m.id }];
             }
@@ -237,13 +266,23 @@ const mock = {
                 }
                 return [{ affectedRows: 1 }];
             }
-            if (q.includes('update members set name')) {
-                const m = mockMembers.find(m => m.id == params[6]);
+            if (q.includes('update members set')) {
+                const setClauseMatch = q.match(/update members set\s+([\s\S]+?)\s+where\s+(?:m\.)?id\s*=\s*\?/);
+                const assignments = setClauseMatch
+                    ? setClauseMatch[1].split(',').map(part => part.trim()).filter(Boolean)
+                    : [];
+                const columns = assignments.map(part =>
+                    part.split('=')[0].trim().replace(/^m\./, '').replace(/`/g, '')
+                );
+                const memberId = params[columns.length];
+                const m = mockMembers.find(member => member.id == memberId);
+
                 if (m) {
-                    m.name = params[0]; m.email = params[1]; m.phone = params[2];
-                    m.membership_type = params[3]; m.address = params[4]; m.status = params[5];
+                    columns.forEach((column, idx) => {
+                        m[column] = params[idx];
+                    });
                 }
-                return [{ affectedRows: 1 }];
+                return [{ affectedRows: m ? 1 : 0 }];
             }
             if (q.includes('update issues set due_date')) {
                 const i = mockIssues.find(i => i.id == params[1]);
@@ -288,12 +327,6 @@ const mock = {
                 mockMembers = mockMembers.filter(m => m.id != params[0]);
                 return [{ affectedRows: 1 }];
             }
-        }
-
-        // Auth Queries
-        if (q.includes('from users')) {
-            const user = mockUsers.find(u => u.username === params[0] && u.password === params[1]);
-            return [user ? [user] : []];
         }
 
         return [[]];
